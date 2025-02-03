@@ -1,0 +1,10 @@
+name: finance_hpc_lab
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - numpy
+  - pandas
+  - jupyter
+  - quarto
+  - numba

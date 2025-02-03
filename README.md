@@ -1,6 +1,6 @@
 # Finance HPC Lab
 
-This repository contains materials for the **Finance HPC Lab**, including a tutorial and a lab exercise focused on performance computing in finance using **R** and **Python**.
+This repository contains materials for the **Finance HPC Lab**, including a tutorial and a lab exercise focused on performance computing in finance using **R** and **Python** within **Quarto documents**.
 
 ## 📂 Project Structure
 ```
@@ -9,6 +9,7 @@ This repository contains materials for the **Finance HPC Lab**, including a tuto
 ├── lab01.qmd             # Lab Exercise: Monte Carlo Simulation in R
 ├── setup.R               # R dependency installer
 ├── tutorial01.qmd        # Tutorial: Performance Computing in Finance
+├── environment.yml       # Conda environment file
 ```
 
 ## 🚀 Quick Setup Guide
@@ -17,28 +18,34 @@ This repository contains materials for the **Finance HPC Lab**, including a tuto
 1. **Open Posit IDE (RStudio).**
 2. Go to **File > New Project > Version Control > Git**.
 3. Enter the repository URL:
-   ```
-   https://github.com/YOUR-USERNAME/finance-hpc-lab.git
-   ```
+
+```
+https://github.com/AI-and-trading/finance-hpc-lab.git
+```
 4. Click **Create Project**.
 
-### **2. Set Up the Conda Environment**
-1. Open the built-in **Terminal** in Posit IDE.
-2. Run the following commands:
-   ```sh
-   conda env create -f environment.yml
-   conda activate finance_hpc_lab
-   ```
+### **2. Set Up the Conda Environment for Python**
+Since **Quarto supports both R and Python**, we will use **Conda only for Python dependencies**, while R will be managed system-wide.
 
-### **3. Configure Python in Posit IDE**
-1. Go to **Tools > Global Options > Python**.
-2. Select **Use Conda Environment:** `finance_hpc_lab`.
-3. Click **Apply**.
+1. Install **Miniconda** (if not already installed).
+2. Run the following command to create the environment:
+```sh
+ conda env create -f environment.yml
+ conda activate finance_hpc_lab
+ ```
 
-### **4. Install R Dependencies**
-In R Console, run:
+### **3. Configure Reticulate in R**
+Ensure **reticulate** is set to use the Conda Python environment by adding the following to your `.Rprofile` file:
+
 ```r
-source("setup.R")
+library(reticulate)
+use_condaenv("finance_hpc_lab", required = TRUE)
+```
+
+### **4. Install Quarto in R**
+If Quarto is not already installed, run:
+```r
+install.packages("quarto")
 ```
 
 ---
@@ -46,7 +53,7 @@ source("setup.R")
 ## 📖 Tutorial: Performance Computing in Finance (`tutorial01.qmd`)
 - Introduces **Monte Carlo simulation** in Python.
 - Covers performance optimization techniques in Python (NumPy, Numba).
-- Explains how **R and Python interact** using `reticulate`.
+- Explains how **R and Python interact** using `reticulate` within Quarto.
 
 To run the tutorial:
 1. Open `tutorial01.qmd` in Posit IDE.
@@ -69,12 +76,12 @@ To complete the lab:
 ---
 
 ## 🛠️ Troubleshooting
-- If `conda` is not recognized, restart Posit IDE and try again.
-- If dependencies fail, manually install in R:
+- **If `conda` is not recognized**, restart Posit IDE and try again.
+- **If dependencies fail, manually install in R**:
   ```r
   install.packages("tidyverse")
   ```
-- If Quarto does not work, install via Conda:
+- **If Quarto does not work, install via Conda**:
   ```sh
   conda install -c conda-forge quarto
   ```
