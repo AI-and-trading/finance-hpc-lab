@@ -1,0 +1,162 @@
+---
+title: "Tutorial: Performance Computing in Finance"
+author: ""
+date: "`r Sys.Date()`"
+format: html
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+use_condaenv("finance_hpc_lab", required = TRUE)
+```
+
+## Introduction
+
+In this tutorial, we will see how you can combine R and Python in a computational notebook and critique the performance of a simple algorithm that is prevalent in finance.
+
+## Learning outcomes
+
+-   Using miniconda to set up a Python environment in the cloud
+-   Using Python within R Markdown
+-   Assessing the performance of a Monte Carlo simulator
+-   Comparing performance of Python and R
+
+## R Markdown Python Engine
+
+The reticulate package includes a Python engine for R Markdown that enables easy interoperability between Python and R chunks.
+
+Python chunks behave very similarly to R chunks (including graphical output from matplotlib) and the two languages have full access to each other's objects. Built-in conversion for many Python object types is provided, including NumPy arrays and Pandas data frames.
+
+If you are using knitr version 1.18 or higher, then the reticulate Python engine will be enabled by default whenever reticulate is installed and no further setup is required.
+
+#### Python Version
+
+By default, reticulate uses the version of Python found in the Conda environment specified above. You can check this by running:
+
+```{r}
+Sys.which("python")
+```
+
+To see how many environments are available, run:
+
+```{r}
+conda_list()
+```
+
+### Python Chunks
+
+Python code chunks work exactly like R code chunks: Python code is executed and any print or graphical (matplotlib) output is included within the document.
+
+Python chunks execute within a single Python session, so they have access to all objects created in previous chunks.
+
+## Monte Carlo Simulator
+
+The following Python code sets up a Monte Carlo simulator for option pricing using the Black-Scholes-Merton difference equation (Euler Scheme).
+
+```{python}
+import math
+import numpy as np
+from time import process_time
+```
+
+The below code implements a simple Monte Carlo simulation using base Python.
+
+```{python mc-sim-setup}
+S0 = 36
+T = 1.0
+r = 0.06
+sigma = 0.2
+def mcs_simulation_py(p):
+    M, I = p  # M= number of time intervals, I = number of paths
+    dt = T/M
+    S = np.zeros((M+1, I))
+    S[0] = S0
+    rn = np.random.standard_normal(S.shape)
+    for t in range(1, M+1):
+        for i in range(I):
+            S[t, i] = S[t-1, i] * math.exp((r - sigma**2 / 2) * dt + sigma * math.sqrt(dt) * rn[t, i])
+    return S
+```
+
+## Speed Test of Base Python
+
+```{python}
+I = 10000
+M = 10000
+t1_start = process_time()
+S = mcs_simulation_py((M, I))
+t1_stop = process_time()
+print("Elapsed time in seconds:", t1_stop - t1_start)
+test1 = t1_stop - t1_start
+```
+
+## Speed Test with NumPy Optimization
+
+This version uses `np.exp()` for vectorized performance.
+
+```{python}
+def mcs_simulation_np(p):
+    M, I = p
+    dt = T/M
+    S = np.zeros((M+1, I))
+    S[0] = S0
+    rn = np.random.standard_normal(S.shape)
+    for t in range(1, M+1):
+        for i in range(I):
+            S[t, i] = S[t-1, i] * np.exp((r - sigma**2 / 2) * dt + sigma * math.sqrt(dt) * rn[t, i])
+    return S
+```
+
+```{python}
+t1_start = process_time()
+S = mcs_simulation_np((M, I))
+t1_stop = process_time()
+print("Elapsed time in seconds:", t1_stop - t1_start)
+test2 = t1_stop - t1_start
+```
+
+## Speed Test with Numba
+
+Numba compiles Python code for fast execution.
+
+```{python}
+import numba
+from numba import jit
+
+@jit(nopython=True)
+def mcs_simulation_numba(p):
+    M, I = p
+    dt = T/M
+    S = np.zeros((M+1, I))
+    S[0] = S0
+    rn = np.random.standard_normal(S.shape)
+    for t in range(1, M+1):
+        for i in range(I):
+            S[t, i] = S[t-1, i] * np.exp((r - sigma**2 / 2) * dt + sigma * math.sqrt(dt) * rn[t, i])
+    return S
+```
+
+```{python}
+t1_start = process_time()
+S = mcs_simulation_numba((M, I))
+t1_stop = process_time()
+print("Elapsed time in seconds:", t1_stop - t1_start)
+test3 = t1_stop - t1_start
+```
+
+The compiled function runs significantly faster on subsequent calls:
+
+```{python}
+t1_start = process_time()
+S = mcs_simulation_numba((M, I))
+t1_stop = process_time()
+print("Elapsed time in seconds:", t1_stop - t1_start)
+test4 = t1_stop - t1_start
+```
+
+# Summary
+
+This tutorial provided an introduction to high-performance computing for financial simulations using R and Python. You learned about Monte Carlo simulation and various optimization techniques.
+
+For further exploration, complete the **Lab Exercise: Performance Comparison in R** where you will implement a Monte Carlo simulation in R and compare its performance to Python.

@@ -1,0 +1,67 @@
+---
+title: "Lab 01: Performance Comparison in R"
+author: ""
+date: "`r Sys.Date()`"
+format: html
+---
+
+## Introduction
+
+In this lab, you will implement a Monte Carlo simulator in **R** and compare its performance to the Python versions you explored in the tutorial. This exercise will help you analyze the efficiency of different programming languages in financial simulations.
+
+## Learning Outcomes
+
+- Implement a Monte Carlo simulation in **R**
+- Measure execution time and compare with Python
+- Discuss performance differences between R and Python
+
+## Task 1: Implement a Monte Carlo Simulator in R
+
+Using the same **Black-Scholes-Merton** model from the tutorial, write an R function that simulates asset price paths.
+
+### **Starter Code**
+The following R function is a template. Complete the missing parts to implement the Monte Carlo simulation:
+
+```{r}
+monte_carlo_simulation_r <- function(M, I, S0=36, T=1, r=0.06, sigma=0.2) {
+  dt <- T / M
+  S <- matrix(0, nrow = M+1, ncol = I)
+  S[1, ] <- S0
+  rn <- matrix(rnorm(M * I), nrow = M, ncol = I)
+  
+  for (t in 2:(M+1)) {
+    S[t, ] <- S[t-1, ] * exp((r - 0.5 * sigma^2) * dt + sigma * sqrt(dt) * rn[t-1, ])
+  }
+  return(S)
+}
+```
+
+### **Run the Simulation**
+- Set `M = 10000` (number of time steps)
+- Set `I = 10000` (number of paths)
+- Measure execution time using `system.time()`
+
+```{r}
+M <- 10000
+I <- 10000
+
+start_time <- Sys.time()
+S_r <- monte_carlo_simulation_r(M, I)
+end_time <- Sys.time()
+
+execution_time_r <- end_time - start_time
+print(paste("Elapsed time in seconds:", execution_time_r))
+```
+
+## Task 2: Compare Performance with Python
+
+1. Compare your **R execution time** with the **Python implementations** from the tutorial.
+2. Write a short paragraph discussing:
+   - Is R faster or slower than Python for this simulation?
+   - What factors might explain the difference in execution time?
+   - Could optimization techniques (e.g., vectorization, parallel computing) improve R's performance?
+
+## Submission Instructions
+
+- Submit your completed R script (`lab01-performance-comparison.qmd`).
+- Include your analysis as a short summary at the end of the document.
