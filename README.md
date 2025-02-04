@@ -35,6 +35,12 @@ Since **Quarto supports both R and Python**, we will use **Conda only for Python
  ```
 
 ### **3. Configure Reticulate in R**
+
+Firstly run the `setup.R` script to install R dependencies:
+```r
+source("setup.R")
+```
+
 Ensure **reticulate** is set to use the Conda Python environment by adding the following to your `.Rprofile` file:
 
 ```r
